@@ -85,11 +85,12 @@
             </Style.Triggers>
         </Style>
 
-        <!-- Primary gradient CTA button -->
+        <!-- Primary CTA button -->
         <Style x:Key="ApplyButton" TargetType="Button">
-            <Setter Property="Background" Value="{StaticResource AccentGradientBrush}"/>
-            <Setter Property="Foreground" Value="#000000"/>
-            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="#000000"/>
+            <Setter Property="Foreground" Value="#4CFFA0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#2A2A2A"/>
             <Setter Property="FontSize" Value="13"/>
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="Padding" Value="20,9"/>
@@ -98,6 +99,8 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border x:Name="Bg" Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
                                 CornerRadius="8"
                                 Padding="{TemplateBinding Padding}"
                                 RenderTransformOrigin="0.5,0.5">
