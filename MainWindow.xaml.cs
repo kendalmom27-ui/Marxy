@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -440,6 +441,18 @@ public partial class MainWindow : Window
         var spin = new DoubleAnimation(0, 360, TimeSpan.FromMilliseconds(500));
         RefreshIconRotate.BeginAnimation(RotateTransform.AngleProperty, spin);
         LoadSystemInfo();
+    }
+
+    private void OnDiscordClick(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo("https://discord.gg/bat5hHZSt") { UseShellExecute = true });
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Couldn't open the Discord link: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 
     private void LoadSystemInfo()

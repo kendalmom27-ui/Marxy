@@ -498,6 +498,52 @@
                                 <TextBlock x:Name="NetworkInfo" FontSize="14" Foreground="#B8B8B8" TextWrapping="Wrap" LineHeight="20">Loading network info...</TextBlock>
                             </StackPanel>
                         </Border>
+
+                        <!-- Discord CTA -->
+                        <Button Click="OnDiscordClick" Cursor="Hand" HorizontalContentAlignment="Stretch" Margin="0,0,16,16">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Background" Value="#5865F2"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="Bg" Background="{TemplateBinding Background}" BorderThickness="1" BorderBrush="#4752C4" Padding="24" CornerRadius="14" Width="380"
+                                                        RenderTransformOrigin="0.5,0.5">
+                                                    <Border.Effect>
+                                                        <DropShadowEffect Color="#000000" BlurRadius="10" ShadowDepth="3" Opacity="0.35"/>
+                                                    </Border.Effect>
+                                                    <Border.RenderTransform>
+                                                        <ScaleTransform ScaleX="1" ScaleY="1"/>
+                                                    </Border.RenderTransform>
+                                                    <ContentPresenter/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="Bg" Property="Background" Value="#4752C4"/>
+                                                    </Trigger>
+                                                    <Trigger Property="IsPressed" Value="True">
+                                                        <Setter TargetName="Bg" Property="RenderTransform">
+                                                            <Setter.Value>
+                                                                <ScaleTransform ScaleX="0.98" ScaleY="0.98"/>
+                                                            </Setter.Value>
+                                                        </Setter>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                                    <Border Width="36" Height="36" CornerRadius="10" Background="#4752C4">
+                                        <TextBlock Text="💬" FontSize="17" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <TextBlock FontSize="18" FontWeight="Bold" Foreground="#FFFFFF" VerticalAlignment="Center" Margin="10,0,0,0">Join the Discord</TextBlock>
+                                </StackPanel>
+                                <TextBlock FontSize="14" Foreground="#E4E5FF" TextWrapping="Wrap" LineHeight="20">Get support, share feedback, and hang out with other testers. Click to open the invite.</TextBlock>
+                            </StackPanel>
+                        </Button>
                     </WrapPanel>
                 </ScrollViewer>
 
