@@ -280,9 +280,21 @@ public partial class MainWindow : Window
 
     private async void OnCreditsClick(object sender, RoutedEventArgs e)
     {
-        if (_isTransitioning) return;
-
         SetActiveNav(sender as Button);
+        await ShowCreditsAsync();
+    }
+
+    private async void OnCreditsCardClick(object sender, RoutedEventArgs e)
+    {
+        // Not a sidebar button, but clicking it should still land on Credits with
+        // the Credits sidebar item shown as active, same as navigating there directly.
+        SetActiveNav(CreditsNavBtn);
+        await ShowCreditsAsync();
+    }
+
+    private async Task ShowCreditsAsync()
+    {
+        if (_isTransitioning) return;
 
         try
         {

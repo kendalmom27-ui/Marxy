@@ -554,6 +554,52 @@
                                 <TextBlock FontSize="14" Foreground="#E4E5FF" TextWrapping="Wrap" LineHeight="20">Get support, share feedback, and hang out with other testers. Click to open the invite.</TextBlock>
                             </StackPanel>
                         </Button>
+
+                        <!-- Credits CTA -->
+                        <Button Click="OnCreditsCardClick" Cursor="Hand" HorizontalContentAlignment="Stretch" Margin="0,0,16,16">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Background" Value="#000000"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="Bg" Background="{TemplateBinding Background}" BorderThickness="1" BorderBrush="#1E1E1E" Padding="24" CornerRadius="14" Width="380"
+                                                        RenderTransformOrigin="0.5,0.5">
+                                                    <Border.Effect>
+                                                        <DropShadowEffect Color="#000000" BlurRadius="10" ShadowDepth="3" Opacity="0.35"/>
+                                                    </Border.Effect>
+                                                    <Border.RenderTransform>
+                                                        <ScaleTransform ScaleX="1" ScaleY="1"/>
+                                                    </Border.RenderTransform>
+                                                    <ContentPresenter/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="Bg" Property="BorderBrush" Value="#4CAF50"/>
+                                                    </Trigger>
+                                                    <Trigger Property="IsPressed" Value="True">
+                                                        <Setter TargetName="Bg" Property="RenderTransform">
+                                                            <Setter.Value>
+                                                                <ScaleTransform ScaleX="0.98" ScaleY="0.98"/>
+                                                            </Setter.Value>
+                                                        </Setter>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                                    <Border Width="36" Height="36" CornerRadius="10" Background="#141414">
+                                        <TextBlock Text="✨" FontSize="17" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <TextBlock FontSize="18" FontWeight="Bold" Foreground="#FFFFFF" VerticalAlignment="Center" Margin="10,0,0,0">Credits</TextBlock>
+                                </StackPanel>
+                                <TextBlock FontSize="14" Foreground="#B8B8B8" TextWrapping="Wrap" LineHeight="20">See who made this, what it's built with, and where to find us.</TextBlock>
+                            </StackPanel>
+                        </Button>
                     </WrapPanel>
                 </ScrollViewer>
 
