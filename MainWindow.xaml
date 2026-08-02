@@ -695,7 +695,7 @@
                         <Border Background="#000000" BorderBrush="#1E1E1E" BorderThickness="1" CornerRadius="12" Padding="20" Margin="0,0,0,16">
                             <StackPanel>
                                 <TextBlock Text="Built with" FontSize="11" FontWeight="SemiBold" Foreground="#8A8A8A" Margin="0,0,0,6"/>
-                                <TextBlock Text="WPF on .NET 8, with Claude Code" FontSize="14" Foreground="#B8B8B8"/>
+                                <TextBlock Text="C#" FontSize="14" Foreground="#B8B8B8"/>
                             </StackPanel>
                         </Border>
 
