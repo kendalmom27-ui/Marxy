@@ -41,6 +41,12 @@ namespace RasTweaksCS
             StatusText.Text = $"Downloading update v{info.Version}...";
             ProgressTrack.Visibility = Visibility.Visible;
 
+            // Recorded before the download even starts, not after - if anything
+            // between here and actually running as info.Version goes wrong, the
+            // circuit breaker in CheckForUpdateAsync needs to see this attempt
+            // happened so it can back off instead of retrying immediately forever.
+            UpdateChecker.RecordUpdateAttempt(info.Version);
+
             var tempPath = IOPath.Combine(IOPath.GetTempPath(), "RasTweaksCS_update.exe");
 
             try

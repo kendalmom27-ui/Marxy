@@ -25,6 +25,64 @@ namespace RasTweaksCS
         public static Version CurrentVersion =>
             Assembly.GetExecutingAssembly().GetName().Version ?? new Version(0, 0, 0, 0);
 
+        private static string AttemptMarkerPath => IOPath.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "RasTweaksCS", "last_update_attempt.txt");
+
+        /// <summary>
+        /// Circuit breaker: if we already tried updating to this exact version within
+        /// the last few minutes and are still not running it, something is wrong with
+        /// the update itself (not just "haven't tried yet") - retrying immediately
+        /// would just loop forever, so back off instead and let the current version
+        /// keep running normally until the cooldown passes.
+        /// </summary>
+        private static bool RecentlyFailedToReach(Version targetVersion)
+        {
+            try
+            {
+                if (!File.Exists(AttemptMarkerPath))
+                {
+                    return false;
+                }
+
+                var parts = File.ReadAllText(AttemptMarkerPath).Split('|');
+                if (parts.Length != 2)
+                {
+                    return false;
+                }
+
+                if (!Version.TryParse(parts[0], out var attemptedVersion) || attemptedVersion != targetVersion)
+                {
+                    return false;
+                }
+
+                if (!long.TryParse(parts[1], out var ticks))
+                {
+                    return false;
+                }
+
+                var attemptedAt = new DateTime(ticks, DateTimeKind.Utc);
+                return DateTime.UtcNow - attemptedAt < TimeSpan.FromMinutes(5);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public static void RecordUpdateAttempt(Version targetVersion)
+        {
+            try
+            {
+                Directory.CreateDirectory(IOPath.GetDirectoryName(AttemptMarkerPath)!);
+                File.WriteAllText(AttemptMarkerPath, $"{targetVersion}|{DateTime.UtcNow.Ticks}");
+            }
+            catch
+            {
+                // Best-effort - worst case the circuit breaker just doesn't trip this time.
+            }
+        }
+
         public static async Task<UpdateInfo?> CheckForUpdateAsync()
         {
             using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
@@ -49,6 +107,11 @@ namespace RasTweaksCS
             }
 
             if (remoteVersion <= CurrentVersion)
+            {
+                return null;
+            }
+
+            if (RecentlyFailedToReach(remoteVersion))
             {
                 return null;
             }
@@ -131,6 +194,14 @@ namespace RasTweaksCS
             var pid = Environment.ProcessId;
             var scriptPath = IOPath.Combine(IOPath.GetTempPath(), "RasTweaksCS_apply_update.bat");
 
+            // "move" can silently fail if the exe is still momentarily locked (WPF
+            // shutdown cleanup, or Windows Defender scanning the freshly-downloaded
+            // file are both common causes) - a swallowed failure here used to mean
+            // this just relaunched the OLD exe, which would see the same GitHub
+            // release as "newer" again and loop forever. "if exist newExePath" after
+            // the move reliably tells us whether it actually succeeded (move
+            // consumes the source file on success, leaves it in place on failure),
+            // so this retries instead of trusting the move's exit code.
             var script = "@echo off\r\n" +
                          ":waitloop\r\n" +
                          $"tasklist /FI \"PID eq {pid}\" | find \"{pid}\" >nul\r\n" +
@@ -138,7 +209,16 @@ namespace RasTweaksCS
                          "    timeout /t 1 /nobreak >nul\r\n" +
                          "    goto waitloop\r\n" +
                          ")\r\n" +
+                         "set RETRIES=0\r\n" +
+                         ":moveloop\r\n" +
                          $"move /y \"{newExePath}\" \"{currentExePath}\" >nul 2>&1\r\n" +
+                         $"if exist \"{newExePath}\" (\r\n" +
+                         "    set /a RETRIES+=1\r\n" +
+                         "    if %RETRIES% GEQ 15 goto :done\r\n" +
+                         "    timeout /t 1 /nobreak >nul\r\n" +
+                         "    goto moveloop\r\n" +
+                         ")\r\n" +
+                         ":done\r\n" +
                          $"start \"\" \"{currentExePath}\"\r\n" +
                          "(goto) 2>nul & del \"%~f0\"\r\n";
 
