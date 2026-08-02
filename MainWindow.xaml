@@ -558,7 +558,7 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <!-- CRASH FIX: Use Style instead of inline EventTriggers -->
-                                <Border Background="{StaticResource CardBg}" BorderBrush="#1E1E1E" BorderThickness="1" Padding="0" Margin="0,0,16,16" CornerRadius="12" Width="380"
+                                <Border Background="#000000" BorderBrush="#1E1E1E" BorderThickness="1" Padding="0" Margin="0,0,16,16" CornerRadius="12" Width="380"
                                         Style="{StaticResource TweakCardBorder}">
                                     <Border.Effect>
                                         <DropShadowEffect Color="#000000" BlurRadius="10" ShadowDepth="3" Opacity="0.3"/>
