@@ -338,6 +338,13 @@
                             <TextBlock Text="Aim" FontSize="10" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,4,0,0"/>
                         </StackPanel>
                     </Button>
+                    <Border Height="1" Background="#24293A" Margin="16,10"/>
+                    <Button x:Name="CreditsNavBtn" Click="OnCreditsClick" Style="{StaticResource SidebarButton}" ToolTip="Credits">
+                        <StackPanel>
+                            <TextBlock Text="✨" FontSize="19" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Credits" FontSize="10" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Button>
                 </StackPanel>
             </Border>
 
@@ -617,6 +624,60 @@
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
+                </ScrollViewer>
+
+                <!-- Credits -->
+                <ScrollViewer Grid.Row="1" x:Name="CreditsView" VerticalScrollBarVisibility="Auto" Visibility="Collapsed">
+                    <StackPanel HorizontalAlignment="Left" MaxWidth="480" Margin="0,10,0,0">
+                        <Border Width="64" Height="64" CornerRadius="16" Background="{StaticResource AccentGradientBrush}" HorizontalAlignment="Left" Margin="0,0,0,20">
+                            <Border.Effect>
+                                <DropShadowEffect Color="#4CAF50" BlurRadius="20" ShadowDepth="0" Opacity="0.4"/>
+                            </Border.Effect>
+                            <TextBlock Text="RX" FontSize="24" FontWeight="Bold" Foreground="#000000" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+
+                        <TextBlock Text="RasTweaks" FontSize="24" FontWeight="Bold" Foreground="#FFFFFF" Margin="0,0,0,4"/>
+                        <TextBlock x:Name="CreditsVersionText" Text="Version 1.0.0" FontSize="13" Foreground="#8A8A8A" Margin="0,0,0,24"/>
+
+                        <Border Background="#000000" BorderBrush="#1E1E1E" BorderThickness="1" CornerRadius="12" Padding="20" Margin="0,0,0,16">
+                            <StackPanel>
+                                <TextBlock Text="Created by" FontSize="11" FontWeight="SemiBold" Foreground="#8A8A8A" Margin="0,0,0,6"/>
+                                <TextBlock Text="kendalmom27-ui" FontSize="15" FontWeight="Bold" Foreground="#4CFFA0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Background="#000000" BorderBrush="#1E1E1E" BorderThickness="1" CornerRadius="12" Padding="20" Margin="0,0,0,16">
+                            <StackPanel>
+                                <TextBlock Text="Built with" FontSize="11" FontWeight="SemiBold" Foreground="#8A8A8A" Margin="0,0,0,6"/>
+                                <TextBlock Text="WPF on .NET 8, with Claude Code" FontSize="14" Foreground="#B8B8B8"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Button Click="OnDiscordClick" Cursor="Hand" HorizontalContentAlignment="Stretch">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Background" Value="#5865F2"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="Bg" Background="{TemplateBinding Background}" BorderThickness="1" BorderBrush="#4752C4" Padding="20" CornerRadius="12">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="💬" FontSize="18" VerticalAlignment="Center"/>
+                                                        <TextBlock Text="Join the Discord" FontSize="15" FontWeight="Bold" Foreground="#FFFFFF" VerticalAlignment="Center" Margin="12,0,0,0"/>
+                                                    </StackPanel>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="Bg" Property="Background" Value="#4752C4"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </StackPanel>
                 </ScrollViewer>
             </Grid>
 

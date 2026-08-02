@@ -38,6 +38,7 @@ public partial class MainWindow : Window
     private bool _isTransitioning = false;
     private DispatcherTimer? _startupSpinnerTimer;
     private DispatcherTimer? _startupMessageTimer;
+    private FrameworkElement _currentView = null!;
 
     public MainWindow()
     {
@@ -60,6 +61,8 @@ public partial class MainWindow : Window
             
             HomeView.Visibility = Visibility.Visible;
             TweakListView.Visibility = Visibility.Collapsed;
+            CreditsView.Visibility = Visibility.Collapsed;
+            _currentView = HomeView;
             HeaderIcon.Text = "🏠";
             CategoryTitle.Text = "System Information";
             CategoryDescription.Text = "Your current system specifications and status";
@@ -221,12 +224,12 @@ public partial class MainWindow : Window
     private async void ShowAllTweaks()
     {
         if (_isTransitioning) return;
-        
+
         try
         {
             _isTransitioning = true;
             var count = _allTweaks?.Count ?? 0;
-            await FadeViewTransition(HomeView, TweakListView, "📋", "All Tweaks", $"{count} tweak{(count == 1 ? "" : "s")} across every category");
+            await FadeViewTransition(TweakListView, "📋", "All Tweaks", $"{count} tweak{(count == 1 ? "" : "s")} across every category");
             TweakList.ItemsSource = _allTweaks;
         }
         finally
@@ -238,12 +241,12 @@ public partial class MainWindow : Window
     private async void ShowCategory(string category)
     {
         if (_isTransitioning) return;
-        
+
         try
         {
             _isTransitioning = true;
             var count = _allTweaks?.Count(t => t.Category == category) ?? 0;
-            await FadeViewTransition(HomeView, TweakListView, GetCategoryIcon(category), category, $"{count} tweak{(count == 1 ? "" : "s")} in this category");
+            await FadeViewTransition(TweakListView, GetCategoryIcon(category), category, $"{count} tweak{(count == 1 ? "" : "s")} in this category");
 
             if (_allTweaks != null)
             {
@@ -266,8 +269,26 @@ public partial class MainWindow : Window
         try
         {
             _isTransitioning = true;
-            await FadeViewTransition(TweakListView, HomeView, "🏠", "System Information", "Your current system specifications and status");
+            await FadeViewTransition(HomeView, "🏠", "System Information", "Your current system specifications and status");
             LoadSystemInfo();
+        }
+        finally
+        {
+            _isTransitioning = false;
+        }
+    }
+
+    private async void OnCreditsClick(object sender, RoutedEventArgs e)
+    {
+        if (_isTransitioning) return;
+
+        SetActiveNav(sender as Button);
+
+        try
+        {
+            _isTransitioning = true;
+            CreditsVersionText.Text = $"Version {UpdateChecker.CurrentVersion.ToString(3)}";
+            await FadeViewTransition(CreditsView, "✨", "Credits", "The people and tools behind RasTweaks");
         }
         finally
         {
@@ -287,9 +308,16 @@ public partial class MainWindow : Window
         _ => "✨",
     };
 
-    private async Task FadeViewTransition(FrameworkElement fromView, FrameworkElement toView, string icon, string title, string description)
+    private async Task FadeViewTransition(FrameworkElement toView, string icon, string title, string description)
     {
+        var fromView = _currentView;
         if (fromView == null || toView == null) return;
+
+        if (fromView == toView)
+        {
+            // Already on this view (e.g. clicking the active tab again) - nothing to animate.
+            return;
+        }
 
         fromView.Opacity = 1.0;
 
@@ -315,11 +343,12 @@ public partial class MainWindow : Window
         }
         
         toView.Opacity = 1.0;
+        _currentView = toView;
     }
 
     private void SetActiveNav(Button? active)
     {
-        foreach (var button in new[] { HomeNavBtn, AllTweaksNavBtn, NetworkNavBtn, PowerNavBtn, BootNavBtn, SystemNavBtn, KernelNavBtn, GpuNavBtn, AimNavBtn })
+        foreach (var button in new[] { HomeNavBtn, AllTweaksNavBtn, NetworkNavBtn, PowerNavBtn, BootNavBtn, SystemNavBtn, KernelNavBtn, GpuNavBtn, AimNavBtn, CreditsNavBtn })
         {
             button.Tag = null;
         }
