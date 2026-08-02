@@ -569,8 +569,8 @@
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
 
-                                        <!-- Risk accent strip -->
-                                        <Border Grid.Column="0" Background="{Binding Risk, Converter={StaticResource RiskToBrushConverter}}" CornerRadius="12,0,0,12"/>
+                                        <!-- Left edge: kept black, risk is indicated by the badge chip instead -->
+                                        <Border Grid.Column="0" Background="#000000" CornerRadius="12,0,0,12"/>
 
                                         <Grid Grid.Column="1" Margin="18,18,20,18">
                                             <Grid.RowDefinitions>
