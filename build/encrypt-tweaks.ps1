@@ -15,12 +15,19 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-$key = [byte[]]@(
-    0x8F, 0x2A, 0x14, 0xC7, 0x53, 0xE9, 0x1B, 0x6D,
-    0x40, 0xA2, 0xFB, 0x37, 0x9C, 0x08, 0xD5, 0x71,
-    0x2E, 0xB6, 0x4F, 0x83, 0x1A, 0xCD, 0x60, 0x95,
-    0x0B, 0xE4, 0x77, 0x38, 0xA9, 0x52, 0xDC, 0x11
-)
+# Key is DERIVED (PBKDF2-HMAC-SHA256), never stored as literal bytes, so the
+# shipped exe contains no findable key array. This .ps1 lives only in the
+# private repo (it is not embedded in the exe), so the passphrase being visible
+# here is fine - what matters is that TweakCrypto.cs reconstructs the identical
+# key without any greppable literal. Both sides MUST use identical passphrase,
+# salt, iteration count and hash, or nothing decrypts.
+$passphrase = 'rasx::tweak::vault::9F2C7B14::do-not-share'
+$salt = [byte[]]@(0x52, 0x41, 0x53, 0x58, 0x73, 0x61, 0x6C, 0x74, 0x76, 0x31, 0x9A, 0x3C, 0xE7, 0x08, 0xBD, 0x44)
+$iterations = 100000
+
+$kdf = New-Object System.Security.Cryptography.Rfc2898DeriveBytes($passphrase, $salt, $iterations, [System.Security.Cryptography.HashAlgorithmName]::SHA256)
+$key = $kdf.GetBytes(32)
+$kdf.Dispose()
 
 if (Test-Path $Dest) { Remove-Item $Dest -Recurse -Force }
 New-Item -ItemType Directory -Path $Dest -Force | Out-Null
