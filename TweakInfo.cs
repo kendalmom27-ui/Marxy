@@ -206,6 +206,23 @@ namespace RasTweaksCS
                     Toggleable = true,
                     Warning = "Most useful on SSDs/NVMe where load times are already fast, so Superfetch's preloading benefit is small."
                 },
+                new TweakInfo
+                {
+                    Key = "set-boot-timeout",
+                    Category = "Boot",
+                    Label = "Set Boot Menu Timeout to 6s",
+                    Description = "Shortens how long the Windows Boot Manager waits at the boot menu before starting the default OS (msconfig > Boot > Timeout).",
+                    Risk = "Safe"
+                },
+                new TweakInfo
+                {
+                    Key = "set-numproc-max",
+                    Category = "Boot",
+                    Label = "Set Boot Processor Count to Max",
+                    Description = "Sets the BCD numproc value to this machine's detected logical processor count (msconfig > Boot > Advanced > Number of processors).",
+                    Risk = "Caution",
+                    Warning = "Windows already uses every core when this is left unset, so this is effectively a no-op rather than a speedup - and it hardcodes a number, so it must be re-run after a CPU upgrade or it will cap you. Detected at run time rather than baked in, but if a lower cap was already set, that stale value is what gets detected."
+                },
 
                 // System Tweaks
                 new TweakInfo
