@@ -88,6 +88,15 @@ namespace RasTweaksCS
                     Description = "Disables delayed ACKs and Nagle's algorithm on all adapters for lower latency.",
                     Risk = "Safe"
                 },
+                new TweakInfo
+                {
+                    Key = "disable-netbios",
+                    Category = "Network",
+                    Label = "Disable NetBIOS over TCP/IP",
+                    Description = "Turns off the legacy NetBIOS name-resolution protocol on every adapter, reducing local network broadcast chatter and attack surface.",
+                    Risk = "Caution",
+                    Warning = "Some older LAN devices (printers, NAS boxes, game consoles) and networks without DNS-based name resolution rely on NetBIOS for discovery/file sharing by hostname - those may stop finding each other."
+                },
 
                 // Power Tweaks
                 new TweakInfo
