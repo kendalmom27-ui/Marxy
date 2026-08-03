@@ -230,6 +230,34 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <!-- Small pill toggle used by the live usage monitor (CPU / RAM) -->
+        <Style x:Key="MonitorTabButton" TargetType="Button">
+            <Setter Property="Foreground" Value="#8A8A8A"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Padding" Value="16,6"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="#FFFFFF"/>
+                </Trigger>
+                <Trigger Property="Tag" Value="Active">
+                    <Setter Property="Background" Value="#1E1E1E"/>
+                    <Setter Property="Foreground" Value="#4CFFA0"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </Window.Resources>
 
     <Border Background="{StaticResource WindowBackdropBrush}">
@@ -413,6 +441,75 @@
                 <!-- Home View -->
                 <ScrollViewer Grid.Row="1" x:Name="HomeView" VerticalScrollBarVisibility="Auto">
                     <WrapPanel>
+                        <!-- Live Usage Monitor -->
+                        <Border Background="{StaticResource CardBg}" BorderBrush="#1E1E1E" BorderThickness="1" Padding="20" Margin="0,0,16,16" CornerRadius="14" Width="776">
+                            <Border.Effect>
+                                <DropShadowEffect Color="#000000" BlurRadius="10" ShadowDepth="3" Opacity="0.35"/>
+                            </Border.Effect>
+                            <StackPanel>
+                                <!-- Header: title + CPU/RAM toggle -->
+                                <Grid Margin="0,0,0,16">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock x:Name="MonitorTitle" Grid.Column="0" Text="Loading usage..." FontSize="15" FontWeight="Bold" Foreground="#FFFFFF" VerticalAlignment="Center"/>
+                                    <Border Grid.Column="1" Background="#0A0A0A" CornerRadius="8" Padding="3" BorderBrush="#1E1E1E" BorderThickness="1">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button x:Name="MonCpuBtn" Content="CPU" Click="OnMonitorCpu" Tag="Active" Style="{StaticResource MonitorTabButton}"/>
+                                            <Button x:Name="MonRamBtn" Content="RAM" Click="OnMonitorRam" Style="{StaticResource MonitorTabButton}"/>
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+
+                                <!-- Chart: Y-axis labels + plot -->
+                                <Grid Height="220">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="38"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Grid Grid.Column="0" Margin="0,0,8,0">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Row="0" Text="100%" FontSize="10" Foreground="#5A5A5A" HorizontalAlignment="Right" VerticalAlignment="Top"/>
+                                        <TextBlock Grid.Row="1" Text="50%" FontSize="10" Foreground="#5A5A5A" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Row="2" Text="0%" FontSize="10" Foreground="#5A5A5A" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+                                    </Grid>
+
+                                    <Border Grid.Column="1" Background="#080808" CornerRadius="8" BorderBrush="#1A1A1A" BorderThickness="1">
+                                        <Canvas x:Name="MonitorCanvas" ClipToBounds="True">
+                                            <Polygon x:Name="MonitorFill">
+                                                <Polygon.Fill>
+                                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                        <GradientStop Color="#664CAF50" Offset="0"/>
+                                                        <GradientStop Color="#114CAF50" Offset="0.7"/>
+                                                        <GradientStop Color="#004CAF50" Offset="1"/>
+                                                    </LinearGradientBrush>
+                                                </Polygon.Fill>
+                                            </Polygon>
+                                            <Polyline x:Name="MonitorLine" Stroke="#4CFFA0" StrokeThickness="2" StrokeLineJoin="Round"/>
+                                        </Canvas>
+                                    </Border>
+                                </Grid>
+
+                                <!-- X-axis labels -->
+                                <Grid Margin="46,6,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="60 seconds" FontSize="10" Foreground="#5A5A5A" HorizontalAlignment="Left"/>
+                                    <TextBlock Grid.Column="1" Text="30 seconds" FontSize="10" Foreground="#5A5A5A" HorizontalAlignment="Center"/>
+                                    <TextBlock Grid.Column="2" Text="now" FontSize="10" Foreground="#5A5A5A" HorizontalAlignment="Right"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
                         <!-- CPU Info -->
                         <Border Background="{StaticResource CardBg}" BorderBrush="#1E1E1E" BorderThickness="1" Padding="24" Margin="0,0,16,16" CornerRadius="14" Width="380" Style="{StaticResource StatCardBorder}">
                             <Border.Effect>
