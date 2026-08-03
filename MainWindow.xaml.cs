@@ -93,11 +93,12 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// All tweak scripts are embedded inside the exe (see EmbeddedResource in the
-    /// csproj) so the app can ship as a single file. This unpacks them to disk on
-    /// every launch, since cmd.exe/powershell.exe need a real file to run - always
-    /// overwriting keeps the extracted copies in sync with whatever this exe build
-    /// actually contains, instead of a stale cache from a previous version.
+    /// All tweak scripts are embedded inside the exe as AES-encrypted blobs (see
+    /// the EncryptTweaks target in the csproj) so the shipped exe never carries
+    /// readable .bat/.ps1 source. This decrypts and unpacks them to disk on every
+    /// launch, since cmd.exe/powershell.exe need real files to run - always
+    /// overwriting keeps the extracted copies in sync with this exact build rather
+    /// than a stale cache from a previous version.
     /// </summary>
     private static string ExtractEmbeddedTweaks()
     {
@@ -117,6 +118,7 @@ public partial class MainWindow : Window
                 continue;
             }
 
+            // Resource "Tweaks/foo.bat" holds the AES-encrypted bytes of foo.bat.
             var fileName = resourceName.Substring(prefix.Length);
             var destPath = IOPath.Combine(targetDir, fileName);
 
@@ -126,8 +128,10 @@ public partial class MainWindow : Window
                 continue;
             }
 
-            using var fileStream = File.Create(destPath);
-            resourceStream.CopyTo(fileStream);
+            using var buffer = new MemoryStream();
+            resourceStream.CopyTo(buffer);
+            var decrypted = TweakCrypto.Decrypt(buffer.ToArray());
+            File.WriteAllBytes(destPath, decrypted);
         }
 
         return targetDir;

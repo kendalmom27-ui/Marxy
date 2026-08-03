@@ -15,10 +15,23 @@
     <PackageReference Include="System.Management" Version="8.0.0" />
   </ItemGroup>
 
+  <!-- The exe embeds ONLY the AES-encrypted tweak scripts (TweaksEnc), never the
+       plaintext Tweaks folder - so a decompiled exe yields ciphertext, not readable
+       .bat/.ps1 source. TweakCrypto.cs decrypts them at run time. Tweaks is a flat
+       folder (no subdirectories), hence the flat LogicalName. -->
   <ItemGroup>
-    <EmbeddedResource Include="Tweaks\**\*.*">
-      <LogicalName>Tweaks/%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
+    <EmbeddedResource Include="TweaksEnc\**\*.*">
+      <LogicalName>Tweaks/%(Filename)%(Extension)</LogicalName>
     </EmbeddedResource>
   </ItemGroup>
+
+  <!-- Regenerate the encrypted blobs from the plaintext scripts before every build,
+       so TweaksEnc can never drift out of sync with the real Tweaks source. -->
+  <Target Name="EncryptTweaks" BeforeTargets="BeforeBuild" Condition="'$(_TweaksEncrypted)' != 'true'">
+    <PropertyGroup>
+      <_TweaksEncrypted>true</_TweaksEncrypted>
+    </PropertyGroup>
+    <Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\build\encrypt-tweaks.ps1&quot; -Source &quot;$(MSBuildProjectDirectory)\Tweaks&quot; -Dest &quot;$(MSBuildProjectDirectory)\TweaksEnc&quot;" />
+  </Target>
 
 </Project>
