@@ -176,6 +176,15 @@ namespace RasTweaksCS
                     Description = "Unhides Windows' buried CPU boost policy setting (PERFBOOSTMODE) in Power Options.",
                     Risk = "Safe"
                 },
+                new TweakInfo
+                {
+                    Key = "disable-power-event-processor",
+                    Category = "Power",
+                    Label = "Disable Power Event Processor",
+                    Description = "Stops the kernel from dynamically re-evaluating CPU performance state and core parking in response to power-efficiency events (EventProcessorEnabled = 0).",
+                    Risk = "Caution",
+                    Warning = "Real increase in idle power draw and heat, since the CPU stops stepping down opportunistically. This value is also undocumented by Microsoft - sourced from community tweak packs, so its exact effect is less verified than the powercfg-based tweaks here."
+                },
 
                 // Boot Tweaks
                 new TweakInfo
