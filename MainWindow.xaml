@@ -595,9 +595,9 @@
                                     <Border Width="36" Height="36" CornerRadius="10" Background="#141414">
                                         <TextBlock Text="✨" FontSize="17" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                     </Border>
-                                    <TextBlock FontSize="18" FontWeight="Bold" Foreground="#FFFFFF" VerticalAlignment="Center" Margin="10,0,0,0">Credits</TextBlock>
+                                    <TextBlock FontSize="18" FontWeight="Bold" Foreground="#FFFFFF" VerticalAlignment="Center" Margin="10,0,0,0">RASX labs</TextBlock>
                                 </StackPanel>
-                                <TextBlock FontSize="14" Foreground="#B8B8B8" TextWrapping="Wrap" LineHeight="20">See who made this, what it's built with, and where to find us.</TextBlock>
+                                <TextBlock FontSize="14" Foreground="#B8B8B8" TextWrapping="Wrap" LineHeight="20">Windows optimization, FPS &amp; latency tweaks. Click to see full credits.</TextBlock>
                             </StackPanel>
                         </Button>
                     </WrapPanel>
@@ -687,8 +687,22 @@
 
                         <Border Background="#000000" BorderBrush="#1E1E1E" BorderThickness="1" CornerRadius="12" Padding="20" Margin="0,0,0,16">
                             <StackPanel>
-                                <TextBlock Text="Created by" FontSize="11" FontWeight="SemiBold" Foreground="#8A8A8A" Margin="0,0,0,6"/>
-                                <TextBlock Text="kendalmom27-ui" FontSize="15" FontWeight="Bold" Foreground="#4CFFA0"/>
+                                <TextBlock Text="Brought to you by" FontSize="11" FontWeight="SemiBold" Foreground="#8A8A8A" Margin="0,0,0,8"/>
+                                <TextBlock Text="RASX labs" FontSize="20" FontWeight="Bold" Foreground="{StaticResource AccentGradientBrush}" Margin="0,0,0,2"/>
+                                <TextBlock Text="rasxtweaks &#183; Tweaks / latency / FPS" FontSize="12" Foreground="#8A8A8A" Margin="0,0,0,14"/>
+
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                    <TextBlock Text="🛡" FontSize="13" VerticalAlignment="Center"/>
+                                    <TextBlock Text="RASX Tweaks" FontSize="13" Foreground="#B8B8B8" VerticalAlignment="Center" Margin="9,0,0,0"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                    <TextBlock Text="⚡" FontSize="13" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Windows Optimization" FontSize="13" Foreground="#B8B8B8" VerticalAlignment="Center" Margin="9,0,0,0"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="🎮" FontSize="13" VerticalAlignment="Center"/>
+                                    <TextBlock Text="FPS &amp; Latency Tweaks" FontSize="13" Foreground="#B8B8B8" VerticalAlignment="Center" Margin="9,0,0,0"/>
+                                </StackPanel>
                             </StackPanel>
                         </Border>
 
