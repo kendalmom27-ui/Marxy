@@ -333,6 +333,15 @@ namespace RasTweaksCS
                     Description = "Sets LargeSystemCache=0 so RAM favors application memory over file system cache - the gaming-appropriate side of the old \"Programs vs. System Cache\" setting.",
                     Risk = "Safe"
                 },
+                new TweakInfo
+                {
+                    Key = "enable-threaded-dpc",
+                    Category = "Kernel",
+                    Label = "Enable Threaded DPCs",
+                    Description = "Lets deferred procedure calls (DPC) run as schedulable kernel threads instead of blocking interrupt context, a Vista-era fix for driver-caused audio/input stutter.",
+                    Risk = "Caution",
+                    Warning = "This is a real, settable value, but its actual effect on Windows 10/11 specifically is less certain than most tweaks here - the kernel's DPC handling has changed since this was introduced, and confirming a real latency improvement needs kernel-level measurement tooling, not just a registry check."
+                },
 
                 // GPU Tweaks
                 new TweakInfo
