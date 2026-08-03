@@ -97,6 +97,23 @@ namespace RasTweaksCS
                     Risk = "Caution",
                     Warning = "Some older LAN devices (printers, NAS boxes, game consoles) and networks without DNS-based name resolution rely on NetBIOS for discovery/file sharing by hostname - those may stop finding each other."
                 },
+                new TweakInfo
+                {
+                    Key = "disable-qos-bandwidth-reservation",
+                    Category = "Network",
+                    Label = "Release QoS Bandwidth Reservation",
+                    Description = "Frees the 20% bandwidth Windows reserves by default for QoS-tagged traffic, so UDP game traffic isn't competing for a smaller pool.",
+                    Risk = "Safe"
+                },
+                new TweakInfo
+                {
+                    Key = "increase-udp-buffer-size",
+                    Category = "Network",
+                    Label = "Increase Socket Buffer Size",
+                    Description = "Raises the default UDP/TCP socket buffer size from Windows' ~8KB default to 64KB, reducing dropped packets under bursty traffic (game netcode, voice chat, streaming).",
+                    Risk = "Caution",
+                    Warning = "Minor increase in per-socket kernel memory usage - negligible on any modern system, but not literally free."
+                },
 
                 // Power Tweaks
                 new TweakInfo
