@@ -325,6 +325,14 @@ namespace RasTweaksCS
                     Risk = "Security",
                     Warning = "This is a real security tradeoff: your system becomes more vulnerable to CPU side-channel attacks."
                 },
+                new TweakInfo
+                {
+                    Key = "optimize-memory-for-programs",
+                    Category = "Kernel",
+                    Label = "Optimize Memory for Programs",
+                    Description = "Sets LargeSystemCache=0 so RAM favors application memory over file system cache - the gaming-appropriate side of the old \"Programs vs. System Cache\" setting.",
+                    Risk = "Safe"
+                },
 
                 // GPU Tweaks
                 new TweakInfo
