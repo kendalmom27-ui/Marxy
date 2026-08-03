@@ -323,38 +323,47 @@ public partial class MainWindow : Window
     private async Task FadeViewTransition(FrameworkElement toView, string icon, string title, string description)
     {
         var fromView = _currentView;
-        if (fromView == null || toView == null) return;
+        if (toView == null) return;
 
-        if (fromView == toView)
+        // Several distinct destinations (Network, Power, Boot, System, Kernel, GPU,
+        // Aim, All Tweaks) all share the same TweakListView container. Skipping the
+        // fade animation when the container's already visible is fine, but the
+        // header text/icon below must always update regardless - it used to be
+        // gated behind this same check, which meant switching between two category
+        // tabs changed the cards but left the old tab's name on screen.
+        var sameContainerAlreadyVisible = fromView == toView;
+
+        if (!sameContainerAlreadyVisible && fromView != null)
         {
-            // Already on this view (e.g. clicking the active tab again) - nothing to animate.
-            return;
+            fromView.Opacity = 1.0;
+
+            for (double i = 1; i >= 0; i -= 0.1)
+            {
+                fromView.Opacity = i;
+                await Task.Delay(15);
+            }
+
+            fromView.Visibility = Visibility.Collapsed;
+            toView.Visibility = Visibility.Visible;
+            toView.Opacity = 0;
         }
-
-        fromView.Opacity = 1.0;
-
-        for (double i = 1; i >= 0; i -= 0.1)
-        {
-            fromView.Opacity = i;
-            await Task.Delay(15);
-        }
-
-        fromView.Visibility = Visibility.Collapsed;
-        toView.Visibility = Visibility.Visible;
-        toView.Opacity = 0;
 
         HeaderIcon.Text = icon;
         CategoryTitle.Text = title;
         CategoryDescription.Text = description;
         RefreshInfoButton.Visibility = toView == HomeView ? Visibility.Visible : Visibility.Collapsed;
 
-        for (double i = 0; i <= 1; i += 0.1)
+        if (!sameContainerAlreadyVisible)
         {
-            toView.Opacity = i;
-            await Task.Delay(15);
+            for (double i = 0; i <= 1; i += 0.1)
+            {
+                toView.Opacity = i;
+                await Task.Delay(15);
+            }
+
+            toView.Opacity = 1.0;
         }
-        
-        toView.Opacity = 1.0;
+
         _currentView = toView;
     }
 
