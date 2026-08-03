@@ -41,8 +41,33 @@ jobs:
           -p:Version=${{ steps.version.outputs.version }}
           -o publish
 
-      - name: Create GitHub Release
+      # Published to the SEPARATE public releases repo, not this one - this repo
+      # is private so its own releases would be unreadable to the app's updater
+      # (which ships without an auth token by design). RELEASE_TOKEN must be a
+      # PAT with contents:write on the releases repo, stored as a repo secret.
+      #
+      # generate_release_notes is off: it would pull commit messages out of the
+      # private source repo and publish them publicly, which defeats the point.
+      - name: Publish release to public releases repo
         uses: softprops/action-gh-release@v2
         with:
+          repository: kendalmom27-ui/Marxy-releases
+          token: ${{ secrets.RELEASE_TOKEN }}
+          tag_name: v${{ steps.version.outputs.version }}
+          name: v${{ steps.version.outputs.version }}
           files: publish/RasTweaksCS.exe
-          generate_release_notes: true
+          generate_release_notes: false
+
+      # TRANSITIONAL - delete this step once testers are all on >= v1.7.0.
+      # Anyone still running an older build has the OLD repo baked into their
+      # exe and only looks for updates there, so the transition build has to be
+      # published here too or they get silently orphaned. Only works while this
+      # repo is still public; harmless (just skipped) once it isn't.
+      - name: Also publish to legacy repo for old clients
+        continue-on-error: true
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: v${{ steps.version.outputs.version }}
+          files: publish/RasTweaksCS.exe
+          generate_release_notes: false

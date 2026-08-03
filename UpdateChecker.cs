@@ -19,8 +19,13 @@ namespace RasTweaksCS
 
     public static class UpdateChecker
     {
+        // Points at the public releases-only repo, NOT the private source repo.
+        // The app ships with no auth token (anything embedded in a distributed exe
+        // is extractable), so the releases it checks have to live somewhere
+        // publicly readable - hence the split: source private, builds published
+        // across to this public repo by CI.
         private const string RepoOwner = "kendalmom27-ui";
-        private const string RepoName = "Marxy";
+        private const string RepoName = "Marxy-releases";
 
         public static Version CurrentVersion =>
             Assembly.GetExecutingAssembly().GetName().Version ?? new Version(0, 0, 0, 0);
