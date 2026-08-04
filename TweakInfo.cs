@@ -446,6 +446,34 @@ namespace RasTweaksCS
                     Risk = "Caution",
                     Warning = "Couldn't be verified on real NVIDIA hardware, and this service also exists on non-NVIDIA systems - so it's not strictly vendor-locked and its real effect is unconfirmed. To revert, set the service's Start value back to 3. Restart required."
                 },
+                new TweakInfo
+                {
+                    Key = "increase-tdr-ddi-delay",
+                    Category = "GPU",
+                    Label = "Increase GPU DDI Timeout",
+                    Description = "Raises TdrDdiDelay to 8s, the documented companion to TdrDelay - so both driver-hang timeouts move together and don't cause false resets under heavy GPU load.",
+                    Risk = "Caution",
+                    Warning = "Like TdrDelay, if the GPU genuinely hangs your screen stays frozen a bit longer before Windows recovers it. Restart required. To revert, delete the TdrDdiDelay value."
+                },
+                new TweakInfo
+                {
+                    Key = "disable-gpu-preemption",
+                    Category = "GPU",
+                    Label = "Disable GPU Preemption",
+                    Description = "Sets EnablePreemption = 0 so the GPU finishes each task before switching, a latency tweak some setups prefer for steadier frame delivery.",
+                    Risk = "Caution",
+                    Warning = "Community tweak, not officially documented. Genuine tradeoff: without preemption, frame pacing can get WORSE in some workloads. Experimental - test your games and revert (set EnablePreemption to 1) if it doesn't help. Restart required."
+                },
+                new TweakInfo
+                {
+                    Key = "disable-amd-ulps",
+                    Category = "GPU",
+                    Vendor = "AMD",
+                    Label = "Disable ULPS",
+                    Description = "Disables AMD's Ultra Low Power State (EnableUlps = 0) on Radeon adapters - a long-standing AMD tweak to reduce micro-stutter and wake-from-idle hitches.",
+                    Risk = "Caution",
+                    Warning = "Only affects AMD/Radeon GPUs (safely does nothing on others). Couldn't be verified on real AMD hardware here, so the effect is unconfirmed. To revert, set EnableUlps back to 1. Restart required."
+                },
 
                 // Aim Tweaks
                 new TweakInfo
