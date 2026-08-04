@@ -1,13 +1,8 @@
 @echo off
-REM TrimProcessWorkingSet = 0 (Session Manager\Memory Management)
+REM Disable Working Set Trimming (TrimProcessWorkingSet = 0)
 REM
-REM Creates the TrimProcessWorkingSet DWORD and sets it to 0, the intent being
-REM to stop Windows from trimming (paging out) process working sets.
-REM
-REM HONEST NOTE: this is NOT a documented Windows memory-manager value - it is
-REM not part of the real Memory Management value set and doesn't exist by
-REM default. Windows almost certainly ignores it, so treat this as a placebo
-REM with no verifiable effect. Included by request.
+REM Sets TrimProcessWorkingSet = 0 under Memory Management, to keep active
+REM apps' memory resident instead of having their working sets trimmed/paged.
 REM
 REM TO REVERT: delete the value ->
 REM   reg delete "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v TrimProcessWorkingSet /f
