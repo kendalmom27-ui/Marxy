@@ -268,6 +268,15 @@ namespace RasTweaksCS
                     Risk = "Caution",
                     Warning = "Windows already uses every core when this is left unset, so this is effectively a no-op rather than a speedup - and it hardcodes a number, so it must be re-run after a CPU upgrade or it will cap you. Detected at run time rather than baked in, but if a lower cap was already set, that stale value is what gets detected."
                 },
+                new TweakInfo
+                {
+                    Key = "disable-hypervisor",
+                    Category = "Boot",
+                    Label = "Disable Hypervisor / VBS",
+                    Description = "Turns off the hypervisor at boot (hypervisorlaunchtype off), disabling Virtualization-Based Security / Memory Integrity to remove their CPU overhead.",
+                    Risk = "Security",
+                    Warning = "Turns OFF a security feature (VBS / Memory Integrity), and breaks anything that needs the hypervisor - WSL2, Windows Sandbox, Hyper-V, and virtual machines stop working. Restart required; to revert, set hypervisorlaunchtype to auto."
+                },
 
                 // System Tweaks
                 new TweakInfo
