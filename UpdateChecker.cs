@@ -34,57 +34,79 @@ namespace RasTweaksCS
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             "RasTweaksCS", "last_update_attempt.txt");
 
-        /// <summary>
-        /// Circuit breaker: if we already tried updating to this exact version within
-        /// the last few minutes and are still not running it, something is wrong with
-        /// the update itself (not just "haven't tried yet") - retrying immediately
-        /// would just loop forever, so back off instead and let the current version
-        /// keep running normally until the cooldown passes.
-        /// </summary>
-        private static bool RecentlyFailedToReach(Version targetVersion)
+        // A genuine interruption (user closes the app mid-download) should retry on the
+        // very next launch. A real broken-update LOOP (swap keeps failing, app relaunches
+        // itself over and over in seconds) should still be caught so it can't spin forever.
+        // The two are told apart by TIMING + COUNT: a loop re-attempts within seconds and
+        // racks up a count fast; a person reopening the app does so minutes later, which
+        // resets the count. So we only back off after several *rapid* failures, never after
+        // a single interrupted attempt.
+        private const int MaxRapidAttempts = 3;
+        private static readonly TimeSpan RapidWindow = TimeSpan.FromMinutes(2);
+        private static readonly TimeSpan Cooldown = TimeSpan.FromMinutes(5);
+
+        private static (Version? version, DateTime time, int count) ReadMarker()
         {
             try
             {
                 if (!File.Exists(AttemptMarkerPath))
                 {
-                    return false;
+                    return (null, DateTime.MinValue, 0);
                 }
 
                 var parts = File.ReadAllText(AttemptMarkerPath).Split('|');
-                if (parts.Length != 2)
+                if (parts.Length < 3
+                    || !Version.TryParse(parts[0], out var v)
+                    || !long.TryParse(parts[1], out var ticks)
+                    || !int.TryParse(parts[2], out var count))
                 {
-                    return false;
+                    return (null, DateTime.MinValue, 0);
                 }
 
-                if (!Version.TryParse(parts[0], out var attemptedVersion) || attemptedVersion != targetVersion)
-                {
-                    return false;
-                }
-
-                if (!long.TryParse(parts[1], out var ticks))
-                {
-                    return false;
-                }
-
-                var attemptedAt = new DateTime(ticks, DateTimeKind.Utc);
-                return DateTime.UtcNow - attemptedAt < TimeSpan.FromMinutes(5);
+                return (v, new DateTime(ticks, DateTimeKind.Utc), count);
             }
             catch
             {
+                return (null, DateTime.MinValue, 0);
+            }
+        }
+
+        /// <summary>
+        /// Only blocks when we've failed to reach this version several times in RAPID
+        /// succession (a genuine update loop) AND are still within the cooldown. A single
+        /// interrupted update - or attempts spaced minutes apart - never blocks.
+        /// </summary>
+        private static bool ShouldBackOff(Version targetVersion)
+        {
+            var (version, time, count) = ReadMarker();
+            if (version == null || version != targetVersion)
+            {
                 return false;
             }
+
+            return count >= MaxRapidAttempts && DateTime.UtcNow - time < Cooldown;
         }
 
         public static void RecordUpdateAttempt(Version targetVersion)
         {
             try
             {
+                var (version, time, count) = ReadMarker();
+
+                // Count up only for repeated attempts on the SAME version in quick
+                // succession (the loop signature). Anything else - new version, or a gap
+                // longer than the rapid window - starts fresh at 1, so a person reopening
+                // the app after an interrupted update always gets a clean retry.
+                var newCount = (version == targetVersion && DateTime.UtcNow - time < RapidWindow)
+                    ? count + 1
+                    : 1;
+
                 Directory.CreateDirectory(IOPath.GetDirectoryName(AttemptMarkerPath)!);
-                File.WriteAllText(AttemptMarkerPath, $"{targetVersion}|{DateTime.UtcNow.Ticks}");
+                File.WriteAllText(AttemptMarkerPath, $"{targetVersion}|{DateTime.UtcNow.Ticks}|{newCount}");
             }
             catch
             {
-                // Best-effort - worst case the circuit breaker just doesn't trip this time.
+                // Best-effort - worst case the loop guard just doesn't trip this time.
             }
         }
 
@@ -116,7 +138,7 @@ namespace RasTweaksCS
                 return null;
             }
 
-            if (RecentlyFailedToReach(remoteVersion))
+            if (ShouldBackOff(remoteVersion))
             {
                 return null;
             }
