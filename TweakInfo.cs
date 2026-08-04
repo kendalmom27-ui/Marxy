@@ -394,6 +394,24 @@ namespace RasTweaksCS
                 },
                 new TweakInfo
                 {
+                    Key = "disable-timer-serialization",
+                    Category = "Kernel",
+                    Label = "Disable Timer Serialization",
+                    Description = "Sets SerializeTimerExpiration = 0 so kernel timers fire without waiting on a synchronized ordering path.",
+                    Risk = "Caution",
+                    Warning = "Benefit is debated and not independently confirmed - low risk, but don't expect a guaranteed improvement. Restart required; to revert, set the value back to 1."
+                },
+                new TweakInfo
+                {
+                    Key = "enable-cache-aware-scheduling",
+                    Category = "Kernel",
+                    Label = "Enable Cache-Aware Scheduling",
+                    Description = "Sets CacheAwareScheduling = 1 to favor keeping threads within CPU cache boundaries instead of moving them freely across cores.",
+                    Risk = "Caution",
+                    Warning = "This value isn't present by default and whether current Windows honors it is uncertain, so treat the benefit as unconfirmed. Low risk. Restart required; to revert, delete the value."
+                },
+                new TweakInfo
+                {
                     Key = "enable-global-timer-resolution",
                     Category = "Kernel",
                     Label = "Global Timer Resolution",
