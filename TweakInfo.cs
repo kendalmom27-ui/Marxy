@@ -367,6 +367,15 @@ namespace RasTweaksCS
                 },
                 new TweakInfo
                 {
+                    Key = "enable-global-timer-resolution",
+                    Category = "Kernel",
+                    Label = "Global Timer Resolution",
+                    Description = "Restores system-wide timer resolution (GlobalTimerResolutionRequests = 1) so a high resolution requested by any app applies globally, as it did before Windows 11 scoped it per-process.",
+                    Risk = "Caution",
+                    Warning = "A global high timer resolution slightly raises power draw and limits deep CPU idle, since the system tick runs more often. Restart required; to revert, delete the value."
+                },
+                new TweakInfo
+                {
                     Key = "disable-memory-compression",
                     Category = "Kernel",
                     Label = "Disable Memory Compression",
