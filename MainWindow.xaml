@@ -259,36 +259,52 @@
             </Style.Triggers>
         </Style>
 
-        <!-- GPU vendor selector button (holds the NVIDIA / AMD logo) -->
-        <Style x:Key="VendorButton" TargetType="Button">
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Background" Value="#0A0A0A"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="10" Padding="18,12"
-                                BorderThickness="2" BorderBrush="#1E1E1E">
-                            <ContentPresenter x:Name="Content" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.45"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Content" Property="Opacity" Value="0.8"/>
-                                <Setter TargetName="Bg" Property="BorderBrush" Value="#2A2A2A"/>
-                            </Trigger>
-                            <Trigger Property="Tag" Value="Active">
-                                <Setter TargetName="Content" Property="Opacity" Value="1"/>
-                                <Setter TargetName="Bg" Property="BorderBrush" Value="#4CAF50"/>
-                                <Setter TargetName="Bg" Property="Effect">
-                                    <Setter.Value>
-                                        <DropShadowEffect Color="#4CAF50" BlurRadius="14" ShadowDepth="0" Opacity="0.4"/>
-                                    </Setter.Value>
-                                </Setter>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
+
+        <!-- Shared tweak card, used by the normal list and the GPU vendor sections -->
+        <DataTemplate x:Key="TweakCardTemplate">
+            <Border Background="#000000" BorderBrush="#1E1E1E" BorderThickness="1" Padding="0" Margin="0,0,16,16" CornerRadius="12" Width="380"
+                    Style="{StaticResource TweakCardBorder}">
+                <Border.Effect>
+                    <DropShadowEffect Color="#000000" BlurRadius="10" ShadowDepth="3" Opacity="0.3"/>
+                </Border.Effect>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="4"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Border Grid.Column="0" Background="#000000" CornerRadius="12,0,0,12"/>
+                    <Grid Grid.Column="1" Margin="18,18,20,18">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0" Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" FontSize="16" Text="{Binding Category, Converter={StaticResource CategoryToIconConverter}}" VerticalAlignment="Center"/>
+                            <Border Grid.Column="1" Background="{Binding Risk, Converter={StaticResource RiskToBrushConverter}}" CornerRadius="4" Padding="7,3" HorizontalAlignment="Right">
+                                <TextBlock FontSize="10" Text="{Binding Risk}" Foreground="#000000" FontWeight="Bold"/>
+                            </Border>
+                        </Grid>
+                        <StackPanel Grid.Row="1">
+                            <TextBlock FontWeight="Bold" FontSize="16" Text="{Binding Label}" Foreground="#FFFFFF" TextWrapping="Wrap"/>
+                            <TextBlock FontSize="13" Text="{Binding Description}" TextWrapping="Wrap" Foreground="#B8B8B8" Margin="0,8,0,0" LineHeight="18"/>
+                            <Border Background="#1A140C" BorderBrush="{Binding Risk, Converter={StaticResource RiskToBrushConverter}}" BorderThickness="1" CornerRadius="6" Padding="10,8" Margin="0,10,0,0"
+                                    Visibility="{Binding Warning, Converter={StaticResource EmptyToVisibilityConverter}}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="⚠" FontSize="12" Foreground="{Binding Risk, Converter={StaticResource RiskToBrushConverter}}" VerticalAlignment="Top" Margin="0,1,8,0"/>
+                                    <TextBlock Text="{Binding Warning}" FontSize="11" Foreground="#C8C8C8" TextWrapping="Wrap" LineHeight="15"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                        <Button Grid.Row="2" Content="Apply" Click="OnApplyTweak" Tag="{Binding Key}" Style="{StaticResource ApplyButton}" Margin="0,14,0,0" HorizontalAlignment="Stretch"/>
+                    </Grid>
+                </Grid>
+            </Border>
+        </DataTemplate>
     </Window.Resources>
 
     <Border Background="{StaticResource WindowBackdropBrush}">
@@ -732,92 +748,43 @@
                 </ScrollViewer>
 
                 <!-- Tweak List -->
-                <Grid Grid.Row="1" x:Name="TweakListView" Visibility="Collapsed">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
+                <ScrollViewer Grid.Row="1" x:Name="TweakListView" VerticalScrollBarVisibility="Auto" Visibility="Collapsed">
+                    <StackPanel>
+                        <!-- Normal single list (every category except GPU, and All Tweaks) -->
+                        <ItemsControl x:Name="TweakList" ItemTemplate="{StaticResource TweakCardTemplate}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
 
-                    <!-- Vendor switch: shown only for the GPU category -->
-                    <Border x:Name="VendorBar" Grid.Row="0" Visibility="Collapsed" Margin="0,0,0,18">
-                        <StackPanel Orientation="Horizontal">
-                            <Button x:Name="NvidiaBtn" Click="OnSelectNvidia" Style="{StaticResource VendorButton}" Tag="Active" ToolTip="NVIDIA">
-                                <Image Source="/Assets/nvidia.png" Height="36" Stretch="Uniform"/>
-                            </Button>
-                            <Button x:Name="AmdBtn" Click="OnSelectAmd" Style="{StaticResource VendorButton}" Margin="12,0,0,0" ToolTip="AMD">
-                                <Image Source="/Assets/amd.png" Height="36" Stretch="Uniform"/>
-                            </Button>
+                        <!-- GPU category: two stacked vendor sections you scroll between -->
+                        <StackPanel x:Name="GpuSections" Visibility="Collapsed">
+                            <!-- NVIDIA section -->
+                            <Image Source="/Assets/nvidia.png" Height="42" HorizontalAlignment="Left" Stretch="Uniform" Margin="2,0,0,14"/>
+                            <ItemsControl x:Name="NvidiaTweaksList" ItemTemplate="{StaticResource TweakCardTemplate}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+
+                            <Border Height="1" Background="#1E1E1E" Margin="0,10,16,26"/>
+
+                            <!-- AMD section -->
+                            <Image Source="/Assets/amd.png" Height="42" HorizontalAlignment="Left" Stretch="Uniform" Margin="2,0,0,14"/>
+                            <ItemsControl x:Name="AmdTweaksList" ItemTemplate="{StaticResource TweakCardTemplate}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
                         </StackPanel>
-                    </Border>
-
-                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                    <ItemsControl x:Name="TweakList">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <!-- CRASH FIX: Use Style instead of inline EventTriggers -->
-                                <Border Background="#000000" BorderBrush="#1E1E1E" BorderThickness="1" Padding="0" Margin="0,0,16,16" CornerRadius="12" Width="380"
-                                        Style="{StaticResource TweakCardBorder}">
-                                    <Border.Effect>
-                                        <DropShadowEffect Color="#000000" BlurRadius="10" ShadowDepth="3" Opacity="0.3"/>
-                                    </Border.Effect>
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="4"/>
-                                            <ColumnDefinition Width="*"/>
-                                        </Grid.ColumnDefinitions>
-
-                                        <!-- Left edge: kept black, risk is indicated by the badge chip instead -->
-                                        <Border Grid.Column="0" Background="#000000" CornerRadius="12,0,0,12"/>
-
-                                        <Grid Grid.Column="1" Margin="18,18,20,18">
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="Auto"/>
-                                                <RowDefinition Height="*"/>
-                                                <RowDefinition Height="Auto"/>
-                                            </Grid.RowDefinitions>
-
-                                            <!-- Header: category icon + risk badge -->
-                                            <Grid Grid.Row="0" Margin="0,0,0,12">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition Width="*"/>
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock Grid.Column="0" FontSize="16" Text="{Binding Category, Converter={StaticResource CategoryToIconConverter}}" VerticalAlignment="Center"/>
-                                                <Border Grid.Column="1" Background="{Binding Risk, Converter={StaticResource RiskToBrushConverter}}" CornerRadius="4" Padding="7,3" HorizontalAlignment="Right">
-                                                    <TextBlock FontSize="10" Text="{Binding Risk}" Foreground="#000000" FontWeight="Bold"/>
-                                                </Border>
-                                            </Grid>
-
-                                            <!-- Content -->
-                                            <StackPanel Grid.Row="1">
-                                                <TextBlock FontWeight="Bold" FontSize="16" Text="{Binding Label}" Foreground="#FFFFFF" TextWrapping="Wrap"/>
-                                                <TextBlock FontSize="13" Text="{Binding Description}" TextWrapping="Wrap" Foreground="#B8B8B8" Margin="0,8,0,0" LineHeight="18"/>
-
-                                                <!-- Warning banner: only shown when the tweak carries a Warning -->
-                                                <Border Background="#1A140C" BorderBrush="{Binding Risk, Converter={StaticResource RiskToBrushConverter}}" BorderThickness="1" CornerRadius="6" Padding="10,8" Margin="0,10,0,0"
-                                                        Visibility="{Binding Warning, Converter={StaticResource EmptyToVisibilityConverter}}">
-                                                    <StackPanel Orientation="Horizontal">
-                                                        <TextBlock Text="⚠" FontSize="12" Foreground="{Binding Risk, Converter={StaticResource RiskToBrushConverter}}" VerticalAlignment="Top" Margin="0,1,8,0"/>
-                                                        <TextBlock Text="{Binding Warning}" FontSize="11" Foreground="#C8C8C8" TextWrapping="Wrap" LineHeight="15"/>
-                                                    </StackPanel>
-                                                </Border>
-                                            </StackPanel>
-
-                                            <!-- Button -->
-                                            <Button Grid.Row="2" Content="Apply" Click="OnApplyTweak" Tag="{Binding Key}" Style="{StaticResource ApplyButton}" Margin="0,14,0,0" HorizontalAlignment="Stretch"/>
-                                        </Grid>
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                    </ScrollViewer>
-                </Grid>
+                    </StackPanel>
+                </ScrollViewer>
 
                 <!-- Credits -->
                 <ScrollViewer Grid.Row="1" x:Name="CreditsView" VerticalScrollBarVisibility="Auto" Visibility="Collapsed">

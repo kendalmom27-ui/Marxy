@@ -51,9 +51,6 @@ public partial class MainWindow : Window
 
     private DiscordPresence? _discordPresence;
 
-    private string _currentCategory = "";
-    private string _selectedVendor = "Nvidia";
-
     public MainWindow()
     {
         AppDomain.CurrentDomain.UnhandledException += (s, e) =>
@@ -251,11 +248,9 @@ public partial class MainWindow : Window
         try
         {
             _isTransitioning = true;
-            _currentCategory = "";
             var count = _allTweaks?.Count ?? 0;
             await FadeViewTransition(TweakListView, "📋", "All Tweaks", $"{count} tweak{(count == 1 ? "" : "s")} across every category");
-            VendorBar.Visibility = Visibility.Collapsed;
-            TweakList.ItemsSource = _allTweaks;
+            ShowSingleList(_allTweaks);
         }
         finally
         {
@@ -270,14 +265,26 @@ public partial class MainWindow : Window
         try
         {
             _isTransitioning = true;
-            _currentCategory = category;
-            var count = _allTweaks?.Count(t => t.Category == category) ?? 0;
-            await FadeViewTransition(TweakListView, GetCategoryIcon(category), category, $"{count} tweak{(count == 1 ? "" : "s")} in this category");
 
-            // The GPU category gets a NVIDIA/AMD vendor switch; every other category
-            // hides it and just lists all its tweaks.
-            VendorBar.Visibility = category == "GPU" ? Visibility.Visible : Visibility.Collapsed;
-            ApplyCategoryFilter();
+            if (category == "GPU")
+            {
+                var gpu = _allTweaks?.Where(t => t.Category == "GPU").ToList() ?? new List<TweakInfo>();
+                await FadeViewTransition(TweakListView, GetCategoryIcon("GPU"), "GPU", $"{gpu.Count} tweak{(gpu.Count == 1 ? "" : "s")} - NVIDIA and AMD");
+
+                // Universal GPU tweaks (Vendor == "") apply to both cards, so they appear
+                // in each vendor section; vendor-specific ones show only in their section.
+                NvidiaTweaksList.ItemsSource = gpu.Where(t => string.IsNullOrEmpty(t.Vendor) || t.Vendor == "Nvidia").ToList();
+                AmdTweaksList.ItemsSource = gpu.Where(t => string.IsNullOrEmpty(t.Vendor) || t.Vendor == "AMD").ToList();
+
+                TweakList.Visibility = Visibility.Collapsed;
+                GpuSections.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                var count = _allTweaks?.Count(t => t.Category == category) ?? 0;
+                await FadeViewTransition(TweakListView, GetCategoryIcon(category), category, $"{count} tweak{(count == 1 ? "" : "s")} in this category");
+                ShowSingleList(_allTweaks?.Where(t => t.Category == category).ToList());
+            }
         }
         finally
         {
@@ -285,30 +292,11 @@ public partial class MainWindow : Window
         }
     }
 
-    private void ApplyCategoryFilter()
+    private void ShowSingleList(IEnumerable<TweakInfo>? tweaks)
     {
-        if (_allTweaks == null) return;
-
-        IEnumerable<TweakInfo> query = _allTweaks.Where(t => t.Category == _currentCategory);
-
-        if (_currentCategory == "GPU")
-        {
-            // Show the selected vendor's tweaks plus universal ones (Vendor == "").
-            query = query.Where(t => string.IsNullOrEmpty(t.Vendor) || t.Vendor == _selectedVendor);
-        }
-
-        TweakList.ItemsSource = query.ToList();
-    }
-
-    private void OnSelectNvidia(object sender, RoutedEventArgs e) => SetVendor("Nvidia");
-    private void OnSelectAmd(object sender, RoutedEventArgs e) => SetVendor("AMD");
-
-    private void SetVendor(string vendor)
-    {
-        _selectedVendor = vendor;
-        NvidiaBtn.Tag = vendor == "Nvidia" ? "Active" : null;
-        AmdBtn.Tag = vendor == "AMD" ? "Active" : null;
-        ApplyCategoryFilter();
+        GpuSections.Visibility = Visibility.Collapsed;
+        TweakList.Visibility = Visibility.Visible;
+        TweakList.ItemsSource = tweaks;
     }
 
     private async void OnHomeClick(object sender, RoutedEventArgs e)
