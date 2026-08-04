@@ -386,6 +386,14 @@ namespace RasTweaksCS
                 },
                 new TweakInfo
                 {
+                    Key = "distribute-timers",
+                    Category = "Kernel",
+                    Label = "Distribute Timer Interrupts",
+                    Description = "Spreads clock-tick / timer interrupt handling across all cores instead of concentrating it on CPU 0 (DistributeTimers = 1), reducing contention.",
+                    Risk = "Safe"
+                },
+                new TweakInfo
+                {
                     Key = "enable-global-timer-resolution",
                     Category = "Kernel",
                     Label = "Global Timer Resolution",
