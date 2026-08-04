@@ -49,6 +49,8 @@ public partial class MainWindow : Window
     private string _cpuName = "CPU";
     private bool _monitorSampling;
 
+    private DiscordPresence? _discordPresence;
+
     public MainWindow()
     {
         AppDomain.CurrentDomain.UnhandledException += (s, e) =>
@@ -77,6 +79,10 @@ public partial class MainWindow : Window
             CategoryDescription.Text = "Your current system specifications and status";
             LoadSystemInfo();
             StartUsageMonitor();
+
+            _discordPresence = new DiscordPresence();
+            _discordPresence.Start();
+            this.Closed += (s, e) => _discordPresence?.Dispose();
 
             RunStartupRestorePointSequence();
         }
