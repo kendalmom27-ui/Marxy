@@ -189,6 +189,15 @@ namespace RasTweaksCS
                     Risk = "Caution",
                     Warning = "Real increase in idle power draw and heat, since the CPU stops stepping down opportunistically. This value is also undocumented by Microsoft - sourced from community tweak packs, so its exact effect is less verified than the powercfg-based tweaks here."
                 },
+                new TweakInfo
+                {
+                    Key = "disable-modern-standby",
+                    Category = "Power",
+                    Label = "Disable Modern Standby",
+                    Description = "Forces traditional S3 deep sleep instead of Modern Standby / S0 idle (PlatformAoAcOverride = 0), reducing standby battery drain and wake quirks.",
+                    Risk = "Caution",
+                    Warning = "Many modern thin laptops only support Modern Standby - on those, disabling it can make sleep behave oddly or not enter deep sleep. Best on desktops or machines that still expose S3. Restart required; to revert, delete the PlatformAoAcOverride value."
+                },
 
                 // Boot Tweaks
                 new TweakInfo
