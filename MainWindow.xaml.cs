@@ -511,7 +511,7 @@ public partial class MainWindow : Window
     {
         try
         {
-            Process.Start(new ProcessStartInfo("https://discord.gg/bat5hHZSt") { UseShellExecute = true });
+            Process.Start(new ProcessStartInfo("https://discord.gg/v5Hy39pxe") { UseShellExecute = true });
         }
         catch (Exception ex)
         {
