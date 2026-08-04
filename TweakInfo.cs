@@ -436,6 +436,16 @@ namespace RasTweaksCS
                     Risk = "Caution",
                     Warning = "This setting's behavior has been inconsistent across Windows updates since 1809."
                 },
+                new TweakInfo
+                {
+                    Key = "disable-gpu-energy-driver",
+                    Category = "GPU",
+                    Vendor = "Nvidia",
+                    Label = "Disable GPU Energy Driver",
+                    Description = "Disables the GpuEnergyDrv power-management driver service (Start = 4), a community NVIDIA tuning tweak.",
+                    Risk = "Caution",
+                    Warning = "Couldn't be verified on real NVIDIA hardware, and this service also exists on non-NVIDIA systems - so it's not strictly vendor-locked and its real effect is unconfirmed. To revert, set the service's Start value back to 3. Restart required."
+                },
 
                 // Aim Tweaks
                 new TweakInfo
