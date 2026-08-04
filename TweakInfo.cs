@@ -1,8 +1,27 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace RasTweaksCS
 {
+    /// <summary>One selectable preset value for a parameterized tweak (e.g. 0x26 hex).</summary>
+    public class TweakOption : INotifyPropertyChanged
+    {
+        public string Label { get; set; } = "";     // shown on the chip, e.g. "0x26 hex"
+        public string Value { get; set; } = "";     // passed to the script, e.g. "38"
+        public bool Recommended { get; set; }
+        public TweakInfo? Parent { get; set; }
+
+        private bool _isSelected;
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set { _isSelected = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsSelected))); }
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+    }
+
     public class TweakInfo
     {
         public string Key { get; set; } = "";
@@ -16,13 +35,17 @@ namespace RasTweaksCS
         // GPU tweaks only: "Nvidia" or "AMD" to show under just that vendor's tab,
         // or "" (default) to show under both vendors. Ignored for non-GPU categories.
         public string Vendor { get; set; } = "";
+
+        // When set, the card shows a preset-value picker and Apply runs the script
+        // with the selected option's Value passed as an argument. Null = plain tweak.
+        public List<TweakOption>? Options { get; set; }
     }
 
     public static class TweakRegistry
     {
         public static List<TweakInfo> GetAllTweaks()
         {
-            return new List<TweakInfo>
+            var tweaks = new List<TweakInfo>
             {
                 // Network Tweaks
                 new TweakInfo
@@ -321,10 +344,17 @@ namespace RasTweaksCS
                 {
                     Key = "win32-priority-separation",
                     Category = "Kernel",
-                    Label = "Foreground Priority Boost",
-                    Description = "Tunes CPU scheduling to favor the active foreground app (Win32PrioritySeparation = 0x26).",
+                    Label = "Set Win32 Priority Separation",
+                    Description = "Tunes CPU scheduling to favor the active foreground app. Pick a preset below (0x26 is the common gaming value).",
                     Risk = "Caution",
-                    Warning = "Background apps (streaming software, Discord, etc.) may feel less smooth while a foreground app is focused."
+                    Warning = "Background apps (streaming software, Discord, etc.) may feel less smooth while a foreground app is focused. Restart recommended.",
+                    Options = new List<TweakOption>
+                    {
+                        new TweakOption { Label = "0x26 hex", Value = "38", Recommended = true, IsSelected = true },
+                        new TweakOption { Label = "0x18 hex", Value = "24" },
+                        new TweakOption { Label = "0x16 hex", Value = "22" },
+                        new TweakOption { Label = "0x2A hex", Value = "42" }
+                    }
                 },
                 new TweakInfo
                 {
@@ -511,6 +541,21 @@ namespace RasTweaksCS
                     Risk = "Safe"
                 }
             };
+
+            // Back-link each preset option to its tweak, so a chip click can find and
+            // update its siblings' selection state.
+            foreach (var tweak in tweaks)
+            {
+                if (tweak.Options != null)
+                {
+                    foreach (var option in tweak.Options)
+                    {
+                        option.Parent = tweak;
+                    }
+                }
+            }
+
+            return tweaks;
         }
     }
 }

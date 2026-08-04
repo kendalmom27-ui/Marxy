@@ -486,11 +486,19 @@ public partial class MainWindow : Window
                 return;
             }
 
+            // For parameterized tweaks, pass the selected preset's value as an argument.
+            string? argument = null;
+            if (button.DataContext is TweakInfo tweak && tweak.Options != null)
+            {
+                var selected = tweak.Options.FirstOrDefault(o => o.IsSelected) ?? tweak.Options.FirstOrDefault();
+                argument = selected?.Value;
+            }
+
             originalContent = button.Content;
             button.IsEnabled = false;
             button.Content = "Running...";
 
-            var result = await Task.Run(() => _tweakRunner.RunTweakAsync(tweakKey));
+            var result = await Task.Run(() => _tweakRunner.RunTweakAsync(tweakKey, argument));
 
             var notification = new TweakNotificationWindow();
             notification.Owner = this;
@@ -521,6 +529,18 @@ public partial class MainWindow : Window
             {
                 button.IsEnabled = true;
                 button.Content = originalContent ?? "Apply";
+            }
+        }
+    }
+
+    private void OnSelectOption(object sender, RoutedEventArgs e)
+    {
+        // Select the clicked preset chip and clear its siblings.
+        if (sender is Button b && b.DataContext is TweakOption option && option.Parent?.Options != null)
+        {
+            foreach (var o in option.Parent.Options)
+            {
+                o.IsSelected = ReferenceEquals(o, option);
             }
         }
     }

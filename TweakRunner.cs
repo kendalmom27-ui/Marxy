@@ -25,7 +25,7 @@ namespace RasTweaksCS
             }
         }
 
-        public async Task<TweakResult> RunTweakAsync(string tweakName)
+        public async Task<TweakResult> RunTweakAsync(string tweakName, string? argument = null)
         {
             var scriptPath = IOPath.Combine(_tweaksPath, $"{tweakName}.bat");
 
@@ -38,13 +38,22 @@ namespace RasTweaksCS
                 };
             }
 
+            // Parameterized tweaks (e.g. the Win32 priority preset) pass a chosen
+            // value as the script's first argument. Only allow simple values so a
+            // crafted option can't inject extra commands.
+            var argSuffix = "";
+            if (!string.IsNullOrEmpty(argument) && IsSafeArgument(argument))
+            {
+                argSuffix = $" {argument}";
+            }
+
             try
             {
                 using var process = new Process();
                 process.StartInfo = new ProcessStartInfo
                 {
                     FileName = "cmd.exe",
-                    Arguments = $"/c \"{scriptPath}\"",
+                    Arguments = $"/c \"{scriptPath}\"{argSuffix}",
                     CreateNoWindow = true,
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
@@ -104,6 +113,20 @@ namespace RasTweaksCS
                     Message = $"Error running tweak: {ex.Message}"
                 };
             }
+        }
+
+        // Preset option values are simple numbers/hex only. Reject anything else so a
+        // value can never carry shell metacharacters into the cmd line.
+        private static bool IsSafeArgument(string argument)
+        {
+            foreach (var c in argument)
+            {
+                if (!char.IsLetterOrDigit(c) && c != 'x' && c != 'X')
+                {
+                    return false;
+                }
+            }
+            return argument.Length is > 0 and <= 12;
         }
 
         public async Task<TweakResult> RunPowerShellScriptAsync(string scriptName, int timeoutSeconds = 60)
