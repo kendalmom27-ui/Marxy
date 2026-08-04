@@ -16,6 +16,14 @@
     <PackageReference Include="System.Management" Version="8.0.0" />
   </ItemGroup>
 
+  <!-- Vendor logos for the GPU tab, embedded as WPF resources (loadable via
+       /Assets/... pack URIs at runtime - the safe way to reference images, unlike
+       the earlier Window.Icon path). -->
+  <ItemGroup>
+    <Resource Include="Assets\nvidia.png" />
+    <Resource Include="Assets\amd.png" />
+  </ItemGroup>
+
   <!-- The exe embeds ONLY the AES-encrypted tweak scripts (TweaksEnc), never the
        plaintext Tweaks folder - so a decompiled exe yields ciphertext, not readable
        .bat/.ps1 source. TweakCrypto.cs decrypts them at run time. Tweaks is a flat

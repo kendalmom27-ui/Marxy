@@ -258,6 +258,37 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+
+        <!-- GPU vendor selector button (holds the NVIDIA / AMD logo) -->
+        <Style x:Key="VendorButton" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="#0A0A0A"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="10" Padding="18,12"
+                                BorderThickness="2" BorderBrush="#1E1E1E">
+                            <ContentPresenter x:Name="Content" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.45"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Content" Property="Opacity" Value="0.8"/>
+                                <Setter TargetName="Bg" Property="BorderBrush" Value="#2A2A2A"/>
+                            </Trigger>
+                            <Trigger Property="Tag" Value="Active">
+                                <Setter TargetName="Content" Property="Opacity" Value="1"/>
+                                <Setter TargetName="Bg" Property="BorderBrush" Value="#4CAF50"/>
+                                <Setter TargetName="Bg" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect Color="#4CAF50" BlurRadius="14" ShadowDepth="0" Opacity="0.4"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
     <Border Background="{StaticResource WindowBackdropBrush}">
@@ -701,7 +732,25 @@
                 </ScrollViewer>
 
                 <!-- Tweak List -->
-                <ScrollViewer Grid.Row="1" x:Name="TweakListView" VerticalScrollBarVisibility="Auto" Visibility="Collapsed">
+                <Grid Grid.Row="1" x:Name="TweakListView" Visibility="Collapsed">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Vendor switch: shown only for the GPU category -->
+                    <Border x:Name="VendorBar" Grid.Row="0" Visibility="Collapsed" Margin="0,0,0,18">
+                        <StackPanel Orientation="Horizontal">
+                            <Button x:Name="NvidiaBtn" Click="OnSelectNvidia" Style="{StaticResource VendorButton}" Tag="Active" ToolTip="NVIDIA">
+                                <Image Source="/Assets/nvidia.png" Height="36" Stretch="Uniform"/>
+                            </Button>
+                            <Button x:Name="AmdBtn" Click="OnSelectAmd" Style="{StaticResource VendorButton}" Margin="12,0,0,0" ToolTip="AMD">
+                                <Image Source="/Assets/amd.png" Height="36" Stretch="Uniform"/>
+                            </Button>
+                        </StackPanel>
+                    </Border>
+
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                     <ItemsControl x:Name="TweakList">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
@@ -767,7 +816,8 @@
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
-                </ScrollViewer>
+                    </ScrollViewer>
+                </Grid>
 
                 <!-- Credits -->
                 <ScrollViewer Grid.Row="1" x:Name="CreditsView" VerticalScrollBarVisibility="Auto" Visibility="Collapsed">

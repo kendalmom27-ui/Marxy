@@ -12,6 +12,10 @@ namespace RasTweaksCS
         public string Risk { get; set; } = "";
         public string Warning { get; set; } = "";
         public bool Toggleable { get; set; }
+
+        // GPU tweaks only: "Nvidia" or "AMD" to show under just that vendor's tab,
+        // or "" (default) to show under both vendors. Ignored for non-GPU categories.
+        public string Vendor { get; set; } = "";
     }
 
     public static class TweakRegistry

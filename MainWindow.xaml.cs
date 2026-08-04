@@ -51,6 +51,9 @@ public partial class MainWindow : Window
 
     private DiscordPresence? _discordPresence;
 
+    private string _currentCategory = "";
+    private string _selectedVendor = "Nvidia";
+
     public MainWindow()
     {
         AppDomain.CurrentDomain.UnhandledException += (s, e) =>
@@ -248,8 +251,10 @@ public partial class MainWindow : Window
         try
         {
             _isTransitioning = true;
+            _currentCategory = "";
             var count = _allTweaks?.Count ?? 0;
             await FadeViewTransition(TweakListView, "📋", "All Tweaks", $"{count} tweak{(count == 1 ? "" : "s")} across every category");
+            VendorBar.Visibility = Visibility.Collapsed;
             TweakList.ItemsSource = _allTweaks;
         }
         finally
@@ -265,19 +270,45 @@ public partial class MainWindow : Window
         try
         {
             _isTransitioning = true;
+            _currentCategory = category;
             var count = _allTweaks?.Count(t => t.Category == category) ?? 0;
             await FadeViewTransition(TweakListView, GetCategoryIcon(category), category, $"{count} tweak{(count == 1 ? "" : "s")} in this category");
 
-            if (_allTweaks != null)
-            {
-                var categoryTweaks = _allTweaks.Where(t => t.Category == category).ToList();
-                TweakList.ItemsSource = categoryTweaks;
-            }
+            // The GPU category gets a NVIDIA/AMD vendor switch; every other category
+            // hides it and just lists all its tweaks.
+            VendorBar.Visibility = category == "GPU" ? Visibility.Visible : Visibility.Collapsed;
+            ApplyCategoryFilter();
         }
         finally
         {
             _isTransitioning = false;
         }
+    }
+
+    private void ApplyCategoryFilter()
+    {
+        if (_allTweaks == null) return;
+
+        IEnumerable<TweakInfo> query = _allTweaks.Where(t => t.Category == _currentCategory);
+
+        if (_currentCategory == "GPU")
+        {
+            // Show the selected vendor's tweaks plus universal ones (Vendor == "").
+            query = query.Where(t => string.IsNullOrEmpty(t.Vendor) || t.Vendor == _selectedVendor);
+        }
+
+        TweakList.ItemsSource = query.ToList();
+    }
+
+    private void OnSelectNvidia(object sender, RoutedEventArgs e) => SetVendor("Nvidia");
+    private void OnSelectAmd(object sender, RoutedEventArgs e) => SetVendor("AMD");
+
+    private void SetVendor(string vendor)
+    {
+        _selectedVendor = vendor;
+        NvidiaBtn.Tag = vendor == "Nvidia" ? "Active" : null;
+        AmdBtn.Tag = vendor == "AMD" ? "Active" : null;
+        ApplyCategoryFilter();
     }
 
     private async void OnHomeClick(object sender, RoutedEventArgs e)
