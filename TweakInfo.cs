@@ -396,6 +396,15 @@ namespace RasTweaksCS
                 },
                 new TweakInfo
                 {
+                    Key = "disable-trim-working-set",
+                    Category = "Kernel",
+                    Label = "Disable Working Set Trimming",
+                    Description = "Creates TrimProcessWorkingSet = 0, intended to stop Windows paging out process working sets.",
+                    Risk = "Caution",
+                    Warning = "Not a documented Windows memory-manager value - it isn't part of the real Memory Management value set, so Windows almost certainly ignores it. Treat as a placebo with no verified effect. To revert, delete the value."
+                },
+                new TweakInfo
+                {
                     Key = "disable-cpu-mitigations",
                     Category = "Kernel",
                     Label = "Disable CPU Security Mitigations",
