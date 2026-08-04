@@ -109,6 +109,15 @@ namespace RasTweaksCS
                 },
                 new TweakInfo
                 {
+                    Key = "disable-network-throttling",
+                    Category = "Network",
+                    Label = "Disable Network Throttling",
+                    Description = "Sets NetworkThrottlingIndex = 0xFFFFFFFF to lift Windows' network throttle, letting traffic run unrestricted for lower online-game latency.",
+                    Risk = "Caution",
+                    Warning = "The throttle exists to keep audio/video playback smooth under heavy network load - with it off, media can stutter more while the network is saturated. Restart required; to revert, set the value back to 10."
+                },
+                new TweakInfo
+                {
                     Key = "reduce-ack-delay",
                     Category = "Network",
                     Label = "Reduce TCP ACK Delay",
@@ -351,6 +360,7 @@ namespace RasTweaksCS
                     Options = new List<TweakOption>
                     {
                         new TweakOption { Label = "0x26 hex", Value = "38", Recommended = true, IsSelected = true },
+                        new TweakOption { Label = "0x28 hex", Value = "40" },
                         new TweakOption { Label = "0x18 hex", Value = "24" },
                         new TweakOption { Label = "0x16 hex", Value = "22" },
                         new TweakOption { Label = "0x2A hex", Value = "42" }
