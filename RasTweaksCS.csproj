@@ -24,6 +24,14 @@
     <Resource Include="Assets\amd.png" />
   </ItemGroup>
 
+  <!-- Intro loop (royalty-free piano) played on the startup splash. Embedded so it
+       ships inside the single-file exe; loaded as a stream by SoundPlayer at runtime. -->
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\intro.wav">
+      <LogicalName>intro.wav</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
   <!-- The exe embeds ONLY the AES-encrypted tweak scripts (TweaksEnc), never the
        plaintext Tweaks folder - so a decompiled exe yields ciphertext, not readable
        .bat/.ps1 source. TweakCrypto.cs decrypts them at run time. Tweaks is a flat

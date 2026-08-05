@@ -942,6 +942,34 @@
                     </StackPanel>
                 </Border>
             </Grid>
+
+            <!-- Intro splash: personal message typed out, piano loop, click anywhere to continue -->
+            <Grid x:Name="IntroOverlay" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Background="#000000" Visibility="Collapsed"
+                  MouseLeftButtonDown="OnIntroClick" Cursor="Hand">
+                <!-- faint accent glow -->
+                <Ellipse Width="700" Height="700" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.10" IsHitTestVisible="False">
+                    <Ellipse.Fill>
+                        <RadialGradientBrush>
+                            <GradientStop Color="#4CAF50" Offset="0"/>
+                            <GradientStop Color="#004CAF50" Offset="1"/>
+                        </RadialGradientBrush>
+                    </Ellipse.Fill>
+                </Ellipse>
+
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" MaxWidth="640" Margin="40">
+                    <Border Width="72" Height="72" CornerRadius="18" Background="{StaticResource AccentGradientBrush}" HorizontalAlignment="Center" Margin="0,0,0,34">
+                        <Border.Effect>
+                            <DropShadowEffect Color="#4CAF50" BlurRadius="34" ShadowDepth="0" Opacity="0.6"/>
+                        </Border.Effect>
+                        <TextBlock Text="RX" FontSize="30" FontWeight="Bold" Foreground="#04140C" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+
+                    <TextBlock x:Name="IntroText" FontSize="19" Foreground="#EAEAEA" TextWrapping="Wrap" TextAlignment="Center"
+                               LineHeight="30" MinHeight="130"/>
+
+                    <TextBlock Text="click anywhere to continue" FontSize="12" Foreground="#565656" HorizontalAlignment="Center" Margin="0,34,0,0"/>
+                </StackPanel>
+            </Grid>
         </Grid>
     </Border>
 </Window>

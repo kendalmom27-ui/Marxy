@@ -40,6 +40,15 @@ public partial class MainWindow : Window
     private DispatcherTimer? _startupMessageTimer;
     private FrameworkElement _currentView = null!;
 
+    // Intro splash state
+    private const string IntroMessage =
+        "i started this when i was 10 im happy to make something like this " +
+        "i used to live in oakland going house to house but we bulit something great " +
+        "im proud to say we are Almost complete.";
+    private System.Media.SoundPlayer? _introSound;
+    private DispatcherTimer? _introTypeTimer;
+    private TaskCompletionSource<bool>? _introContinue;
+
     // Live usage monitor state
     private const int MonitorMaxSamples = 60;
     private DispatcherTimer? _monitorTimer;
@@ -82,9 +91,9 @@ public partial class MainWindow : Window
 
             _discordPresence = new DiscordPresence();
             _discordPresence.Start();
-            this.Closed += (s, e) => _discordPresence?.Dispose();
+            this.Closed += (s, e) => { _discordPresence?.Dispose(); StopIntroSound(); };
 
-            RunStartupRestorePointSequence();
+            RunStartupSequence();
         }
         catch (Exception ex)
         {
@@ -172,6 +181,96 @@ public partial class MainWindow : Window
         SetCount(KernelNavBtn, "Kernel");
         SetCount(GpuNavBtn, "GPU");
         SetCount(AimNavBtn, "Aim");
+    }
+
+    // Runs the intro splash first, then the restore-point sequence.
+    private async void RunStartupSequence()
+    {
+        try
+        {
+            await RunIntroAsync();
+        }
+        catch { /* never let the intro block startup */ }
+
+        RunStartupRestorePointSequence();
+    }
+
+    private async Task RunIntroAsync()
+    {
+        IntroOverlay.Visibility = Visibility.Visible;
+        IntroText.Text = "";
+        _introContinue = new TaskCompletionSource<bool>();
+
+        StartIntroSound();
+
+        // Typewriter: reveal one character at a time.
+        var index = 0;
+        _introTypeTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(48) };
+        _introTypeTimer.Tick += async (s, e) =>
+        {
+            if (index < IntroMessage.Length)
+            {
+                index++;
+                IntroText.Text = IntroMessage.Substring(0, index);
+            }
+            else
+            {
+                _introTypeTimer?.Stop();
+                // Finished typing - hold a few seconds, then auto-continue if they never click.
+                await Task.Delay(TimeSpan.FromSeconds(5));
+                _introContinue?.TrySetResult(true);
+            }
+        };
+        _introTypeTimer.Start();
+
+        // Wait for a click (any time) or the auto-continue above.
+        await _introContinue.Task;
+
+        _introTypeTimer?.Stop();
+        _introTypeTimer = null;
+        StopIntroSound();
+
+        // Quick fade out.
+        for (double o = 1.0; o >= 0; o -= 0.1)
+        {
+            IntroOverlay.Opacity = o;
+            await Task.Delay(15);
+        }
+        IntroOverlay.Visibility = Visibility.Collapsed;
+        IntroOverlay.Opacity = 1.0;
+    }
+
+    private void OnIntroClick(object sender, MouseButtonEventArgs e)
+    {
+        _introContinue?.TrySetResult(true);
+    }
+
+    private void StartIntroSound()
+    {
+        try
+        {
+            var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("intro.wav");
+            if (stream != null)
+            {
+                _introSound = new System.Media.SoundPlayer(stream);
+                _introSound.PlayLooping();
+            }
+        }
+        catch { /* audio is optional - never block startup on it */ }
+    }
+
+    private void StopIntroSound()
+    {
+        try
+        {
+            _introSound?.Stop();
+            _introSound?.Dispose();
+        }
+        catch { }
+        finally
+        {
+            _introSound = null;
+        }
     }
 
     private async void RunStartupRestorePointSequence()
