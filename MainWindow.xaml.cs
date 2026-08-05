@@ -42,9 +42,8 @@ public partial class MainWindow : Window
 
     // Intro splash state
     private const string IntroMessage =
-        "i started this when i was 10 im happy to make something like this " +
-        "i used to live in oakland going house to house but we bulit something great " +
-        "im proud to say we are Almost complete.";
+        "this was made in C# Brought to you by Raxtweaks " +
+        "we are almost complete with abouloute greatness";
     private System.Media.SoundPlayer? _introSound;
     private DispatcherTimer? _introTypeTimer;
     private TaskCompletionSource<bool>? _introContinue;
