@@ -206,7 +206,7 @@ public partial class MainWindow : Window
         // Typewriter: reveal one character at a time.
         var index = 0;
         _introTypeTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(48) };
-        _introTypeTimer.Tick += async (s, e) =>
+        _introTypeTimer.Tick += (s, e) =>
         {
             if (index < IntroMessage.Length)
             {
@@ -215,15 +215,13 @@ public partial class MainWindow : Window
             }
             else
             {
+                // Finished typing - stop here and wait for the user to click.
                 _introTypeTimer?.Stop();
-                // Finished typing - hold a few seconds, then auto-continue if they never click.
-                await Task.Delay(TimeSpan.FromSeconds(5));
-                _introContinue?.TrySetResult(true);
             }
         };
         _introTypeTimer.Start();
 
-        // Wait for a click (any time) or the auto-continue above.
+        // Wait for a click (any time) - the intro only advances on click.
         await _introContinue.Task;
 
         _introTypeTimer?.Stop();
