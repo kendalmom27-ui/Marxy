@@ -43,7 +43,7 @@ public partial class MainWindow : Window
     // Intro splash state
     private const string IntroMessage =
         "this was made in C# Brought to you by Raxtweaks " +
-        "we are almost complete with abouloute greatness";
+        "we are almost complete with absolute greatness";
     private System.Media.SoundPlayer? _introSound;
     private DispatcherTimer? _introTypeTimer;
     private TaskCompletionSource<bool>? _introContinue;
